@@ -1,0 +1,11 @@
+#API keys - never commit these
+server/.env
+
+#Depedencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+#Build outputs
+client/dist/
+server/dist/
