@@ -15,7 +15,7 @@ app.use(express.json());
 
 app.use("/chat", chatRouter);
 app.use("/feedback", feedbackRouter);
-app.use("/session", sessionRouter);
+app.use("/sessions", sessionRouter);
 
 app.get("/health", (req, res) => {
     res.json({ status: "ok" });
