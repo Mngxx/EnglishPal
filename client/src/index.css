@@ -1,1 +1,40 @@
 @import "tailwindcss";
+
+@layer components {
+    .btn-primary {
+        @apply bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl transition-colors;
+    }
+    .btn-secondary {
+        @apply text-sm text-blue-500 hover:underline
+    }
+    .btn-outline {
+        @apply border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 py-3 rounded-xl font-medium transition-colors;
+    }
+    .chat-bubble-user {
+        @apply px-4 py-2 rounded-xl max-w-sm text-sm bg-blue-500 text-white;
+    }
+    .chat-bubble-ai {
+        @apply px-4 py-2 rounded-xl max-w-sm text-sm bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100;
+    }
+    .text-notes {
+        @apply text-sm text-gray-400
+    }
+    .text-history-feedback {
+        @apply text-sm text-gray-600 dark:text-gray-300 mt-2 line-clamp-2
+    }
+    .text-header {
+        @apply text-2xl font-semibold text-gray-700 dark:text-gray-200
+    }
+    .text-error {
+        @apply text-center text-sm text-red-500 px-4 pb-2
+    }
+    .label-ai-casual-mode {
+        @apply text-xs font-medium bg-green-100 text-green-700 px-3 py-1 rounded-full
+    }
+    .label-ai-formal-mode {
+        @apply text-xs font-medium bg-purple-100 text-purple-700 px-3 py-1 rounded-full
+    }
+    .session-card {
+        @apply border border-gray-200 dark:border-gray-700 rounded-xl p-5 cursor-pointer hover:border-blue-400 transition-colors
+    }
+}
