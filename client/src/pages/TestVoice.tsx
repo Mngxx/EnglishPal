@@ -30,7 +30,7 @@ export function TestVoice() {
     const handleSaveSession = async () => {
         setIsSaving(true);
         try {
-            await fetch("http://localhost:3000/session", {
+            await fetch("http://localhost:3000/sessions", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -80,8 +80,11 @@ export function TestVoice() {
                 <button
                     className="bg-blue-500 hover:bg-blue-700 disabled:opacity-50 text-white px-8 py-4 rounded-xl text-lg"
                     onClick={() => getFeedback(history)}
+                    disabled={isLoadingFeedback || history.length === 0}
                 >
-                    End Session
+                    {isLoadingFeedback
+                        ? "Generating feedback..."
+                        : "End Session"}
                 </button>
             </div>
 
