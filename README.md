@@ -101,7 +101,7 @@ Open `http://localhost:5173` in **Google Chrome**.
 - [x] Voice input/output hooks (Web Speech API)
 - [x] Groq conversation integration
 - [ ] Mode selector (Casual / Formal)
-- [ ] End-of-session feedback report
+- [x] End-of-session feedback report
 - [ ] Session history with SQLite
 
 ### Phase 2 — AWS
