@@ -1,18 +1,19 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
-import { TestVoice } from './pages/TestVoice'
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { History } from "./pages/History";
+import { Session } from "./pages/Session";
+import { SessionDetail } from "./pages/SessionDetail";
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <TestVoice />
-    </>
-  )
+	return (
+		<BrowserRouter>
+			<Routes>
+				{/* Define routes mapping paths to components */}
+				<Route path="/" element={<Session />} />
+				<Route path="/history" element={<History />} />
+				<Route path="/history/:id" element={<SessionDetail />} />
+			</Routes>
+		</BrowserRouter>
+	);
 }
 
-export default App
+export default App;
