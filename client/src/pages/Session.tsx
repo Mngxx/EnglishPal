@@ -14,6 +14,7 @@ export function Session() {
 	const locationState = location.state as {
 		history?: HistoryMessage[];
 		mode?: Mode;
+		id?: number;
 	} | null;
 	const [mode, setMode] = useState<Mode>(locationState?.mode ?? "casual");
 
@@ -57,16 +58,27 @@ export function Session() {
 	const handleSaveSession = async () => {
 		setIsSaving(true);
 		try {
-			await fetch(`${API_URL}/sessions`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					date: new Date().toISOString(),
-					mode: mode,
-					transcript: history,
-					feedback,
-				}),
-			});
+			const sessionId = locationState?.id;
+			if (sessionId) {
+				// Continued session — update existing row
+				await fetch(`${API_URL}/sessions/${sessionId}`, {
+					method: "PATCH",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ transcript: history, feedback }),
+				});
+			} else {
+				// New session — create new row
+				await fetch(`${API_URL}/sessions`, {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						date: new Date().toISOString(),
+						mode,
+						transcript: history,
+						feedback,
+					}),
+				});
+			}
 			clearHistory();
 			clearFeedback();
 		} catch (err) {

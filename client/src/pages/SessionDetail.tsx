@@ -27,6 +27,11 @@ export function SessionDetail() {
 		fetchSession();
 	}, [id]);
 
+	const handleDelete = async () => {
+		await fetch(`${API_URL}/sessions/${id}`, { method: "DELETE" });
+		navigate("/history");
+	};
+
 	if (isLoading)
 		return (
 			<div className="flex items-center justify-center h-screen">
@@ -52,6 +57,7 @@ export function SessionDetail() {
 							state: {
 								history: session.transcript,
 								mode: session.mode,
+								id: session.id,
 							},
 						})
 					}
@@ -103,6 +109,14 @@ export function SessionDetail() {
 						</div>
 					</div>
 				</div>
+			</div>
+			<div className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-2 flex justify-end">
+				<button
+					className="px-4 py-2 rounded-xl border border-red-300 dark:border-red-800 text-red-500 hover:bg-red-50 dark:hover:bg-red-950 text-sm font-medium transition-colors"
+					onClick={handleDelete}
+				>
+					Delete session
+				</button>
 			</div>
 		</div>
 	);

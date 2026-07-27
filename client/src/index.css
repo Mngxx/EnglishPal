@@ -38,4 +38,8 @@
     .session-card {
         @apply border border-gray-200 dark:border-gray-700 rounded-xl p-5 cursor-pointer hover:border-blue-400 transition-colors
     }
+    .session-card-actions {
+        @apply overflow-hidden max-h-0 group-hover:max-h-12 transition-all duration-200;
+    }
+
 }
