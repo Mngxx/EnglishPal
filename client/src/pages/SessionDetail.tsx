@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import { useNavigate, useParams } from "react-router-dom";
 import { ModeBadge } from "../components/ModeBadge";
 import { API_URL } from "../config";
@@ -88,11 +89,20 @@ export function SessionDetail() {
 				))}
 			</div>
 
-			<h2 className="text-lg font-semibold mb-4">Feedback</h2>
-			<div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6">
-				<p className="text-sm whitespace-pre-wrap leading-relaxed">
-					{session.feedback}
-				</p>
+			{/* Feedback */}
+			<div className="mb-10">
+				<div className="flex items-center gap-2 mb-4">
+					<span className="text-base">📋</span>
+					<h2 className="text-lg font-semibold">Feedback</h2>
+				</div>
+				<div className="border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden">
+					<div className="h-1 bg-gradient-to-r from-blue-400 to-indigo-500" />
+					<div className="p-6">
+						<div className="prose prose-sm dark:prose-invert max-w-none">
+							<ReactMarkdown>{session.feedback}</ReactMarkdown>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	);
