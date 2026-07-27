@@ -3,8 +3,9 @@ import { ModeBadge } from "../components/ModeBadge";
 import { useHistory } from "../hooks/useHistory";
 
 export function History() {
-	const { sessions, isLoading, error } = useHistory();
+	const { sessions, isLoading, error, deleteSession } = useHistory();
 	const navigate = useNavigate();
+
 	if (isLoading)
 		return (
 			<div className="flex items-center justify-center h-screen">
@@ -37,7 +38,7 @@ export function History() {
 					{sessions.map((session) => (
 						<div
 							key={session.id}
-							className="session-card"
+							className="session-card group"
 							onClick={() => navigate(`/history/${session.id}`)}
 						>
 							<div className="flex items-center justify-between mb-2">
@@ -56,6 +57,19 @@ export function History() {
 							<p className="text-history-feedback">
 								{session.feedback.slice(0, 120)}...
 							</p>
+							<div className="session-card-actions">
+								<div className="flex justify-end mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+									<button
+										className="text-xs font-medium text-red-400 hover:text-red-600 transition-colors"
+										onClick={(e) => {
+											e.stopPropagation();
+											deleteSession(session.id);
+										}}
+									>
+										Delete session
+									</button>
+								</div>
+							</div>
 						</div>
 					))}
 				</div>
