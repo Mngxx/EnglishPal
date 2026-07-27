@@ -15,7 +15,8 @@ export function Session() {
 		history?: HistoryMessage[];
 		mode?: Mode;
 	} | null;
-	const mode = locationState?.mode ?? "casual";
+	const [mode, setMode] = useState<Mode>(locationState?.mode ?? "casual");
+
 	const {
 		isListening,
 		transcript,
@@ -96,7 +97,32 @@ export function Session() {
 			{/* Header */}
 			<header className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
 				<h1 className="text-lg font-bold">EnglishPal</h1>
-				<ModeBadge mode={mode} />
+				{history.length === 0 ? (
+					<div className="flex rounded-full border border-gray-200 dark:border-gray-700 overflow-hidden text-xs font-medium">
+						<button
+							className={`px-3 py-1 transition-colors ${
+								mode === "casual"
+									? "bg-green-100 text-green-700"
+									: "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+							}`}
+							onClick={() => setMode("casual")}
+						>
+							Casual
+						</button>
+						<button
+							className={`px-3 py-1 transition-colors ${
+								mode === "formal"
+									? "bg-purple-100 text-purple-700"
+									: "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+							}`}
+							onClick={() => setMode("formal")}
+						>
+							Formal
+						</button>
+					</div>
+				) : (
+					<ModeBadge mode={mode} />
+				)}
 				<button className="btn-secondary" onClick={() => navigate("/history")}>
 					History →
 				</button>
