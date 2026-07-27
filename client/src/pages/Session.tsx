@@ -60,14 +60,12 @@ export function Session() {
 		try {
 			const sessionId = locationState?.id;
 			if (sessionId) {
-				// Continued session — update existing row
 				await fetch(`${API_URL}/sessions/${sessionId}`, {
 					method: "PATCH",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({ transcript: history, feedback }),
 				});
 			} else {
-				// New session — create new row
 				await fetch(`${API_URL}/sessions`, {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
@@ -81,6 +79,8 @@ export function Session() {
 			}
 			clearHistory();
 			clearFeedback();
+			clearTranscript();
+			navigate("/", { replace: true, state: null });
 		} catch (err) {
 			console.error(err);
 		} finally {
