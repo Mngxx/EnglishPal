@@ -18,10 +18,13 @@ export function Session() {
 	const mode = locationState?.mode ?? "casual";
 	const {
 		isListening,
+		transcript,
 		error: micError,
 		startListening,
 		stopListening,
 		transcriptRef,
+		clearTranscript,
+		interimTranscript,
 	} = useSpeechRecognition();
 	const { speak, isSpeaking } = useSpeechSynthesis();
 	const {
@@ -43,7 +46,7 @@ export function Session() {
 	const navigate = useNavigate();
 
 	const handleStop = async () => {
-		stopListening();
+		await stopListening();
 		const text = transcriptRef.current;
 		if (!text) return;
 		const reply = await sendMessage(text);
@@ -101,7 +104,7 @@ export function Session() {
 
 			{/* Chat area */}
 			<div className="flex-1 overflow-y-auto px-4 py-6">
-				{history.length === 0 ? (
+				{history.length === 0 && !transcript && !interimTranscript ? (
 					<div className="flex flex-col items-center justify-center h-full text-center gap-3">
 						<p className="text-header">Ready to practice?</p>
 						<p className="text-notes max-w-xs">
@@ -125,6 +128,20 @@ export function Session() {
 								</div>
 							</div>
 						))}
+						{isListening && (transcript || interimTranscript) && (
+							<div className="flex flex-col items-end gap-1">
+								<div className="px-4 py-2 rounded-xl max-w-sm text-sm bg-blue-200 text-blue-800 dark:bg-blue-900 dark:text-blue-200 italic opacity-70">
+									{transcript}
+									{interimTranscript ? ` ${interimTranscript}` : ""}
+								</div>
+								<button
+									className="text-xs text-gray-400 hover:text-red-400 transition-colors"
+									onClick={clearTranscript}
+								>
+									Clear transcript
+								</button>
+							</div>
+						)}
 					</div>
 				)}
 			</div>
@@ -140,7 +157,7 @@ export function Session() {
 					<p className={`text-sm font-medium ${statusColor}`}>{status}</p>
 					<div className="flex gap-4 w-full">
 						<button
-							className="flex-1 btn-primary disabled:opacity-50 py-3"
+							className="flex-1 btn-primary disabled:opacity-50 py-3 transition-colors"
 							onClick={isListening ? handleStop : startListening}
 							disabled={isLoading || isSpeaking}
 						>

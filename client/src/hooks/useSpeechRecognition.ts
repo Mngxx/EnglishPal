@@ -8,19 +8,24 @@ declare global {
 
 interface UseSpeechRecognitionReturn {
 	transcript: string;
+	interimTranscript: string;
 	isListening: boolean;
 	error: string | null;
 	startListening: () => void;
-	stopListening: () => void;
+	stopListening: () => Promise<void>;
 	transcriptRef: RefObject<string>;
+	clearTranscript: () => void;
 }
 
 export function useSpeechRecognition(): UseSpeechRecognitionReturn {
 	const [transcript, setTranscript] = useState("");
+	const [interimTranscript, setInterimTranscript] = useState("");
 	const [isListening, setIsListening] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const recognitionRef = useRef<SpeechRecognition | null>(null);
 	const transcriptRef = useRef("");
+	const lastInterimIndexRef = useRef(-1);
+	const skipUpToIndexRef = useRef(-1);
 
 	const startListening = useCallback(() => {
 		const SpeechRecognition =
@@ -33,10 +38,16 @@ export function useSpeechRecognition(): UseSpeechRecognitionReturn {
 			return;
 		}
 
+		transcriptRef.current = "";
+		setTranscript("");
+		setInterimTranscript("");
+		lastInterimIndexRef.current = -1;
+		skipUpToIndexRef.current = -1;
+
 		const recognition = new SpeechRecognition();
 		recognition.lang = "en-US";
-		recognition.interimResults = false; // only give final results, not guesses mid-speech
-		recognition.continuous = false; // stop after one sentence (simpler to start)
+		recognition.interimResults = true;
+		recognition.continuous = true;
 
 		recognition.onstart = () => {
 			setIsListening(true);
@@ -44,12 +55,27 @@ export function useSpeechRecognition(): UseSpeechRecognitionReturn {
 		};
 
 		recognition.onresult = (event) => {
-			const text = event.results[0]?.[0]?.transcript ?? "";
-			setTranscript(text);
-			transcriptRef.current = text;
+			const result = event.results[event.resultIndex];
+			const idx = event.resultIndex;
+
+			if (idx <= skipUpToIndexRef.current) return; // stale result after a clear
+
+			if (result.isFinal) {
+				const newText = result[0].transcript;
+				const accumulated = transcriptRef.current
+					? `${transcriptRef.current} ${newText}`
+					: newText;
+				transcriptRef.current = accumulated;
+				setTranscript(accumulated);
+				setInterimTranscript("");
+			} else {
+				lastInterimIndexRef.current = idx; // track which interim is in-progress
+				setInterimTranscript(result[0].transcript);
+			}
 		};
 
 		recognition.onerror = (event) => {
+			if (event.error === "no-speech") return;
 			setError(event.error);
 			setIsListening(false);
 		};
@@ -62,17 +88,37 @@ export function useSpeechRecognition(): UseSpeechRecognitionReturn {
 		recognition.start();
 	}, []);
 
-	const stopListening = useCallback(() => {
-		recognitionRef.current?.stop();
-		setIsListening(false);
+	const stopListening = useCallback((): Promise<void> => {
+		return new Promise((resolve) => {
+			const recognition = recognitionRef.current;
+			if (!recognition) {
+				resolve();
+				return;
+			}
+			recognition.onend = () => {
+				setIsListening(false);
+				setInterimTranscript("");
+				resolve();
+			};
+			recognition.stop();
+		});
+	}, []);
+
+	const clearTranscript = useCallback(() => {
+		skipUpToIndexRef.current = lastInterimIndexRef.current;
+		transcriptRef.current = "";
+		setTranscript("");
+		setInterimTranscript("");
 	}, []);
 
 	return {
 		transcript,
+		interimTranscript,
 		isListening,
 		error,
 		startListening,
 		stopListening,
+		clearTranscript,
 		transcriptRef,
 	};
 }
