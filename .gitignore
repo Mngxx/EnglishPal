@@ -1,11 +1,19 @@
-#API keys - never commit these
+# API keys - never commit these
 server/.env
+client/.env
 
-#Depedencies
+# SQLite database files
+server/app.db
+server/app.db-shm
+server/app.db-wal
+
+# Dependencies
 node_modules/
 client/node_modules/
 server/node_modules/
+infra/node_modules/
 
-#Build outputs
+# Build outputs
 client/dist/
 server/dist/
+infra/cdk.out/
