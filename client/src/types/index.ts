@@ -6,7 +6,7 @@ export type HistoryMessage = {
 };
 
 export interface Session {
-	id: number;
+	id: string;
 	date: string;
 	mode: Mode;
 	transcript: HistoryMessage[];
