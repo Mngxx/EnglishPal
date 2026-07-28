@@ -1,6 +1,6 @@
-import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import express from "express";
 import chatRouter from "./routes/chat";
 import feedbackRouter from "./routes/feedback";
 import sessionRouter from "./routes/sessions";
@@ -18,9 +18,9 @@ app.use("/feedback", feedbackRouter);
 app.use("/sessions", sessionRouter);
 
 app.get("/health", (req, res) => {
-    res.json({ status: "ok" });
+	res.json({ status: "ok" });
 });
 
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+	console.log(`Server running on http://localhost:${PORT}`);
 });
