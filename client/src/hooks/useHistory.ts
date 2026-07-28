@@ -7,7 +7,7 @@ interface useHistoryReturn {
 	sessions: Session[];
 	isLoading: boolean;
 	error: string | null;
-	deleteSession: (id: number) => void;
+	deleteSession: (id: string) => void;
 }
 
 export function useHistory(): useHistoryReturn {
@@ -32,7 +32,7 @@ export function useHistory(): useHistoryReturn {
 		fetchSessions();
 	}, []);
 
-	const deleteSession = useCallback(async (id: number) => {
+	const deleteSession = useCallback(async (id: string) => {
 		try {
 			const response = await fetch(`${API_URL}/sessions/${id}`, {
 				method: "DELETE",
