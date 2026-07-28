@@ -25,8 +25,10 @@ router.post("/", (req: Request, res: Response) => {
 		const session = addSession(date, mode, transcript, feedback);
 		res.status(201).json(session);
 	} catch (err) {
-		console.error(err);
-		res.status(500).json({ error: "Failed to save session" });
+		res.status(500).json({
+			error:
+				err instanceof Error ? err.message : "An unexpected error occurred.",
+		});
 	}
 });
 
@@ -53,8 +55,10 @@ router.patch("/:id", (req: Request, res: Response) => {
 		const session = updateSessionByID(transcript, feedback, id);
 		res.status(200).json(session);
 	} catch (err) {
-		console.error(err);
-		res.status(500).json({ error: "Failed to update session" });
+		res.status(500).json({
+			error:
+				err instanceof Error ? err.message : "An unexpected error occurred.",
+		});
 	}
 });
 
@@ -68,8 +72,10 @@ router.delete("/:id", (req: Request, res: Response) => {
 		deleteSessionById(id);
 		res.status(200).json({ message: "Session deleted" });
 	} catch (err) {
-		console.error(err);
-		res.status(500).json({ error: "Failed to delete the specific session" });
+		res.status(500).json({
+			error:
+				err instanceof Error ? err.message : "An unexpected error occurred.",
+		});
 	}
 });
 
@@ -78,8 +84,10 @@ router.get("/", (req: Request, res: Response) => {
 		const sessions = getAllSessions();
 		res.status(200).json(sessions);
 	} catch (err) {
-		console.error(err);
-		res.status(500).json({ error: "Failed to get all sessions" });
+		res.status(500).json({
+			error:
+				err instanceof Error ? err.message : "An unexpected error occurred.",
+		});
 	}
 });
 
@@ -97,8 +105,10 @@ router.get("/:id", (req: Request, res: Response) => {
 		}
 		res.status(200).json(session);
 	} catch (err) {
-		console.error(err);
-		res.status(500).json({ error: "Failed to get the specific session" });
+		res.status(500).json({
+			error:
+				err instanceof Error ? err.message : "An unexpected error occurred.",
+		});
 	}
 });
 

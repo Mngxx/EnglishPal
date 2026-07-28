@@ -43,7 +43,10 @@ router.post("/", async (req: Request, res: Response) => {
 		res.json({ reply });
 	} catch (err) {
 		console.error(err);
-		res.status(500).json({ error: String(err) });
+		res.status(500).json({
+			error:
+				err instanceof Error ? err.message : "AI service failed unexpectedly.",
+		});
 	}
 });
 
