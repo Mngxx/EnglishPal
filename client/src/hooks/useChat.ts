@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { API_URL } from "../config";
-import type { HistoryMessage, Mode } from "../types/index";
+import { assertOk } from "../lib/api";
+import type { HistoryMessage, Mode } from "../types";
 
 type UseChatReturn = {
 	sendMessage: (text: string) => Promise<string>;
@@ -35,7 +36,7 @@ export function useChat(
 						mode,
 					}),
 				});
-
+				await assertOk(response);
 				const data = (await response.json()) as { reply: string };
 
 				const assistantMessage: HistoryMessage = {
@@ -45,8 +46,10 @@ export function useChat(
 
 				setHistory((prev) => [...prev, userMessage, assistantMessage]);
 				return data.reply;
-			} catch {
-				setError("Failed to reach the server.");
+			} catch (err) {
+				setError(
+					err instanceof Error ? err.message : "An unexpected error occurred.",
+				);
 				return "";
 			} finally {
 				setIsLoading(false);

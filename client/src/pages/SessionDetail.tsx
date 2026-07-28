@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { useNavigate, useParams } from "react-router-dom";
-import { ModeBadge } from "../components/ModeBadge";
+import { ModeBadge } from "../components";
 import { API_URL } from "../config";
-import type { Session } from "../types/index";
+import { assertOk } from "../lib/api";
+import type { Session } from "../types";
 
 export function SessionDetail() {
 	const { id } = useParams();
@@ -16,10 +17,13 @@ export function SessionDetail() {
 		const fetchSession = async () => {
 			try {
 				const response = await fetch(`${API_URL}/sessions/${id}`);
+				await assertOk(response);
 				const data = (await response.json()) as Session;
 				setSession(data);
-			} catch (_err) {
-				setError("Failed to load session.");
+			} catch (err) {
+				setError(
+					err instanceof Error ? err.message : "Failed to get all sessions.",
+				);
 			} finally {
 				setIsLoading(false);
 			}
@@ -28,8 +32,17 @@ export function SessionDetail() {
 	}, [id]);
 
 	const handleDelete = async () => {
-		await fetch(`${API_URL}/sessions/${id}`, { method: "DELETE" });
-		navigate("/history");
+		try {
+			const response = await fetch(`${API_URL}/sessions/${id}`, {
+				method: "DELETE",
+			});
+			await assertOk(response);
+			navigate("/history");
+		} catch (err) {
+			setError(
+				err instanceof Error ? err.message : "Failed to delete session.",
+			);
+		}
 	};
 
 	if (isLoading)

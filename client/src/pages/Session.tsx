@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FeedbackReport } from "../components/FeedbackReport";
-import { ModeBadge } from "../components/ModeBadge";
+import { FeedbackReport, ModeBadge } from "../components";
 import { API_URL } from "../config";
-import { useChat } from "../hooks/useChat";
-import { useFeedback } from "../hooks/useFeedback";
-import { useSpeechRecognition } from "../hooks/useSpeechRecognition";
-import { useSpeechSynthesis } from "../hooks/useSpeechSynthesis";
+import {
+	useChat,
+	useFeedback,
+	useSpeechRecognition,
+	useSpeechSynthesis,
+} from "../hooks";
+import { assertOk } from "../lib/api";
 import type { HistoryMessage, Mode } from "../types/index";
 
 export function Session() {
@@ -17,7 +19,7 @@ export function Session() {
 		id?: number;
 	} | null;
 	const [mode, setMode] = useState<Mode>(locationState?.mode ?? "casual");
-
+	const [saveError, setSaveError] = useState<string | null>(null);
 	const {
 		isListening,
 		transcript,
@@ -60,13 +62,14 @@ export function Session() {
 		try {
 			const sessionId = locationState?.id;
 			if (sessionId) {
-				await fetch(`${API_URL}/sessions/${sessionId}`, {
+				const response = await fetch(`${API_URL}/sessions/${sessionId}`, {
 					method: "PATCH",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({ transcript: history, feedback }),
 				});
+				await assertOk(response);
 			} else {
-				await fetch(`${API_URL}/sessions`, {
+				const response = await fetch(`${API_URL}/sessions`, {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
@@ -76,13 +79,16 @@ export function Session() {
 						feedback,
 					}),
 				});
+				await assertOk(response);
 			}
 			clearHistory();
 			clearFeedback();
 			clearTranscript();
 			navigate("/", { replace: true, state: null });
 		} catch (err) {
-			console.error(err);
+			setSaveError(
+				err instanceof Error ? err.message : "Failed to save session.",
+			);
 		} finally {
 			setIsSaving(false);
 		}
@@ -184,9 +190,10 @@ export function Session() {
 				)}
 			</div>
 
-			{/* Errors */}
-			{(micError || chatError || feedbackError) && (
-				<p className="text-error">{micError ?? chatError ?? feedbackError}</p>
+			{(micError || chatError || feedbackError || saveError) && (
+				<p className="text-error">
+					{micError ?? chatError ?? feedbackError ?? saveError}
+				</p>
 			)}
 
 			{/* Controls */}

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { ModeBadge } from "../components/ModeBadge";
-import { useHistory } from "../hooks/useHistory";
+import { ModeBadge } from "../components";
+import { useHistory } from "../hooks";
 
 export function History() {
 	const { sessions, isLoading, error, deleteSession } = useHistory();

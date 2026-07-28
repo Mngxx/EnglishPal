@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { API_URL } from "../config";
-import type { Session } from "../types/index";
+import { assertOk } from "../lib/api";
+import type { Session } from "../types";
 
 interface useHistoryReturn {
 	sessions: Session[];
@@ -17,10 +18,13 @@ export function useHistory(): useHistoryReturn {
 		const fetchSessions = async () => {
 			try {
 				const response = await fetch(`${API_URL}/sessions`);
+				await assertOk(response);
 				const data = (await response.json()) as Session[];
 				setSessions(data);
-			} catch {
-				setError("Failed to reach the server.");
+			} catch (err) {
+				setError(
+					err instanceof Error ? err.message : "An unexpected error occurred.",
+				);
 			} finally {
 				setIsLoading(false);
 			}
@@ -29,8 +33,17 @@ export function useHistory(): useHistoryReturn {
 	}, []);
 
 	const deleteSession = useCallback(async (id: number) => {
-		await fetch(`${API_URL}/sessions/${id}`, { method: "DELETE" });
-		setSessions((prev) => prev.filter((s) => s.id !== id));
+		try {
+			const response = await fetch(`${API_URL}/sessions/${id}`, {
+				method: "DELETE",
+			});
+			await assertOk(response);
+			setSessions((prev) => prev.filter((s) => s.id !== id));
+		} catch (err) {
+			setError(
+				err instanceof Error ? err.message : "Failed to delete session.",
+			);
+		}
 	}, []);
 
 	return { sessions, isLoading, error, deleteSession };

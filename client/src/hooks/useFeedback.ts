@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { API_URL } from "../config";
-import type { HistoryMessage } from "../types/index";
+import { assertOk } from "../lib/api";
+import type { HistoryMessage } from "../types";
 
 interface useFeedbackReturn {
 	feedback: string;
@@ -24,12 +25,14 @@ export function useFeedback(): useFeedbackReturn {
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ history }),
 			});
-
+			await assertOk(response);
 			const data = (await response.json()) as { feedback: string };
 
 			setFeedback(data.feedback);
-		} catch {
-			setError("Failed to reach the server.");
+		} catch (err) {
+			setError(
+				err instanceof Error ? err.message : "An unexpected error occurred.",
+			);
 		} finally {
 			setIsLoadingFeedback(false);
 		}
