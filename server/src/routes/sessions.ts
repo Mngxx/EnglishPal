@@ -5,12 +5,12 @@ import {
 	getAllSessions,
 	getSessionById,
 	updateSessionByID,
-} from "../db/sqlite";
+} from "../db/dynamodb";
 import type { HistoryMessage, Mode } from "../types/index";
 
 const router = Router();
 
-router.post("/", (req: Request, res: Response) => {
+router.post("/", async (req: Request, res: Response) => {
 	const { date, mode, transcript, feedback } = req.body as {
 		date: string;
 		mode: Mode;
@@ -22,7 +22,7 @@ router.post("/", (req: Request, res: Response) => {
 		return;
 	}
 	try {
-		const session = addSession(date, mode, transcript, feedback);
+		const session = await addSession(date, mode, transcript, feedback);
 		res.status(201).json(session);
 	} catch (err) {
 		res.status(500).json({
@@ -32,8 +32,8 @@ router.post("/", (req: Request, res: Response) => {
 	}
 });
 
-router.patch("/:id", (req: Request, res: Response) => {
-	const id = Number(req.params.id);
+router.patch("/:id", async (req: Request, res: Response) => {
+	const id = req.params.id;
 	if (!id) {
 		res.status(400).json({ error: "Missing required session id" });
 		return;
@@ -47,12 +47,12 @@ router.patch("/:id", (req: Request, res: Response) => {
 		return;
 	}
 	try {
-		const existing = getSessionById(id);
+		const existing = await getSessionById(id);
 		if (!existing) {
 			res.status(404).json({ error: "Session not found" });
 			return;
 		}
-		const session = updateSessionByID(transcript, feedback, id);
+		const session = await updateSessionByID(transcript, feedback, id);
 		res.status(200).json(session);
 	} catch (err) {
 		res.status(500).json({
@@ -62,14 +62,14 @@ router.patch("/:id", (req: Request, res: Response) => {
 	}
 });
 
-router.delete("/:id", (req: Request, res: Response) => {
-	const id = Number(req.params.id);
+router.delete("/:id", async (req: Request, res: Response) => {
+	const id = req.params.id;
 	if (!id) {
 		res.status(400).json({ error: "Missing required session id" });
 		return;
 	}
 	try {
-		deleteSessionById(id);
+		await deleteSessionById(id);
 		res.status(200).json({ message: "Session deleted" });
 	} catch (err) {
 		res.status(500).json({
@@ -79,9 +79,9 @@ router.delete("/:id", (req: Request, res: Response) => {
 	}
 });
 
-router.get("/", (req: Request, res: Response) => {
+router.get("/", async (req: Request, res: Response) => {
 	try {
-		const sessions = getAllSessions();
+		const sessions = await getAllSessions();
 		res.status(200).json(sessions);
 	} catch (err) {
 		res.status(500).json({
@@ -91,14 +91,14 @@ router.get("/", (req: Request, res: Response) => {
 	}
 });
 
-router.get("/:id", (req: Request, res: Response) => {
-	const id = Number(req.params.id);
+router.get("/:id", async (req: Request, res: Response) => {
+	const id = req.params.id;
 	if (!id) {
 		res.status(400).json({ error: "Missing required session id" });
 		return;
 	}
 	try {
-		const session = getSessionById(id);
+		const session = await getSessionById(id);
 		if (!session) {
 			res.status(404).json({ error: "Session not found" });
 			return;
