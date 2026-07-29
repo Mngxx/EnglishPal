@@ -1,0 +1,49 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'server/**'
+      - 'infra/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'server/**'
+      - 'infra/**'
+
+jobs:
+  type-check:
+    name: Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install server dependencies
+        run: cd server && npm ci
+      - name: Type check
+        run: cd server && npx tsc --noEmit
+
+  deploy:
+    name: Deploy
+    needs: type-check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install infra dependencies
+        run: cd infra && npm ci
+      - name: Install server dependencies
+        run: cd server && npm ci
+      - name: Deploy
+        run: cd infra && npx cdk deploy --require-approval never
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-southeast-1
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
