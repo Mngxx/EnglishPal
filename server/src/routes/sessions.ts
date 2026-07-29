@@ -32,7 +32,7 @@ router.post("/", async (req: Request, res: Response) => {
 	}
 });
 
-router.patch("/:id", async (req: Request, res: Response) => {
+router.patch("/:id", async (req: Request<{ id: string }>, res: Response) => {
 	const id = req.params.id;
 	if (!id) {
 		res.status(400).json({ error: "Missing required session id" });
@@ -62,7 +62,7 @@ router.patch("/:id", async (req: Request, res: Response) => {
 	}
 });
 
-router.delete("/:id", async (req: Request, res: Response) => {
+router.delete("/:id", async (req: Request<{ id: string }>, res: Response) => {
 	const id = req.params.id;
 	if (!id) {
 		res.status(400).json({ error: "Missing required session id" });
@@ -91,7 +91,7 @@ router.get("/", async (req: Request, res: Response) => {
 	}
 });
 
-router.get("/:id", async (req: Request, res: Response) => {
+router.get("/:id", async (req: Request<{ id: string }>, res: Response) => {
 	const id = req.params.id;
 	if (!id) {
 		res.status(400).json({ error: "Missing required session id" });
