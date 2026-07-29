@@ -1,14 +1,17 @@
 import { type Request, type Response, Router } from "express";
 import Groq from "groq-sdk";
-import { CASUAL_PROMPT, FORMAL_PROMPT } from "../prompts/index";
+import { getRecentSessions } from "../db/dynamodb";
+import {
+	buildMemoryContext,
+	CASUAL_PROMPT,
+	FORMAL_PROMPT,
+} from "../prompts/index";
 import type { HistoryMessage, Mode } from "../types/index";
 
 let groq: Groq | null = null;
 
 function getGroq(): Groq {
-	if (!groq) {
-		groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-	}
+	if (!groq) groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 	return groq;
 }
 
@@ -27,9 +30,11 @@ router.post("/", async (req: Request, res: Response) => {
 	}
 
 	const groq = getGroq();
-	const systemPrompt = mode === "formal" ? FORMAL_PROMPT : CASUAL_PROMPT;
+	const basePrompt = mode === "formal" ? FORMAL_PROMPT : CASUAL_PROMPT;
 
 	try {
+		const recentSessions = await getRecentSessions(3);
+		const systemPrompt = basePrompt + buildMemoryContext(recentSessions);
 		const completion = await groq.chat.completions.create({
 			model: "llama-3.1-8b-instant",
 			messages: [

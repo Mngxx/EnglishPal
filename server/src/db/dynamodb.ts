@@ -57,6 +57,25 @@ export const getAllSessions = async (): Promise<Session[]> => {
 	}));
 };
 
+export const getRecentSessions = async (limit: number): Promise<Session[]> => {
+	const result = await ddb.send(
+		new QueryCommand({
+			TableName: SESSIONS_TABLE,
+			KeyConditionExpression: "userId = :userId",
+			ExpressionAttributeValues: { ":userId": DEFAULT_USER_ID },
+			ScanIndexForward: false,
+			Limit: limit,
+		}),
+	);
+	return (result.Items ?? []).map((item) => ({
+		id: item.sessionId as string,
+		date: item.date as string,
+		mode: item.mode as Mode,
+		transcript: item.transcript as HistoryMessage[],
+		feedback: item.feedback as string,
+	}));
+};
+
 export const getSessionById = async (
 	id: string,
 ): Promise<Session | undefined> => {
