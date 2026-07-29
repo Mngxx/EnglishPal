@@ -39,7 +39,7 @@ export class InfraStack extends cdk.Stack {
 				SESSIONS_TABLE: sessionsTable.tableName,
 				USERS_TABLE: usersTable.tableName,
 				NODE_ENV: "production",
-				CORS_ORIGIN: "*",
+				CORS_ORIGIN: "https://english-89lxls1e8-mngxx1.vercel.app/",
 				GROQ_API_KEY: process.env.GROQ_API_KEY ?? "",
 			},
 		});
