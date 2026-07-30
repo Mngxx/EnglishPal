@@ -24,9 +24,22 @@ export function History() {
 		<div className="max-w-2xl mx-auto px-4 py-10">
 			<div className="flex items-center justify-between mb-8">
 				<h1 className="text-2xl font-bold">Session History</h1>
-				<button className="btn-secondary" onClick={() => navigate("/")}>
-					← New Session
-				</button>
+				<div className="flex gap-2">
+					<button
+						type="button"
+						className="btn-secondary"
+						onClick={() => navigate("/dashboard")}
+					>
+						Dashboard
+					</button>
+					<button
+						type="button"
+						className="btn-secondary"
+						onClick={() => navigate("/")}
+					>
+						← New Session
+					</button>
+				</div>
 			</div>
 
 			{sessions.length === 0 ? (
@@ -60,6 +73,7 @@ export function History() {
 							<div className="session-card-actions">
 								<div className="flex justify-end mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
 									<button
+										type="button"
 										className="text-xs font-medium text-red-400 hover:text-red-600 transition-colors"
 										onClick={(e) => {
 											e.stopPropagation();
