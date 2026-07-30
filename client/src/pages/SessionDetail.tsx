@@ -60,10 +60,15 @@ export function SessionDetail() {
 	return (
 		<div className="max-w-2xl mx-auto px-4 py-10">
 			<div className="flex items-center justify-between mb-8">
-				<button className="btn-secondary" onClick={() => navigate("/history")}>
+				<button
+					type="button"
+					className="btn-secondary"
+					onClick={() => navigate("/history")}
+				>
 					← Back to History
 				</button>
 				<button
+					type="button"
 					className="btn-primary px-4 py-2"
 					onClick={() =>
 						navigate("/", {
@@ -125,6 +130,7 @@ export function SessionDetail() {
 			</div>
 			<div className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-2 flex justify-end">
 				<button
+					type="button"
 					className="px-4 py-2 rounded-xl border border-red-300 dark:border-red-800 text-red-500 hover:bg-red-50 dark:hover:bg-red-950 text-sm font-medium transition-colors"
 					onClick={handleDelete}
 				>

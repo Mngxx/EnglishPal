@@ -118,6 +118,7 @@ export function Session() {
 				{history.length === 0 ? (
 					<div className="flex rounded-full border border-gray-200 dark:border-gray-700 overflow-hidden text-xs font-medium">
 						<button
+							type="button"
 							className={`px-3 py-1 transition-colors ${
 								mode === "casual"
 									? "bg-green-100 text-green-700"
@@ -128,6 +129,7 @@ export function Session() {
 							Casual
 						</button>
 						<button
+							type="button"
 							className={`px-3 py-1 transition-colors ${
 								mode === "formal"
 									? "bg-purple-100 text-purple-700"
@@ -141,9 +143,22 @@ export function Session() {
 				) : (
 					<ModeBadge mode={mode} />
 				)}
-				<button className="btn-secondary" onClick={() => navigate("/history")}>
-					History →
-				</button>
+				<div className="flex gap-2">
+					<button
+						type="button"
+						className="btn-secondary"
+						onClick={() => navigate("/dashboard")}
+					>
+						Dashboard
+					</button>
+					<button
+						type="button"
+						className="btn-secondary"
+						onClick={() => navigate("/history")}
+					>
+						History →
+					</button>
+				</div>
 			</header>
 
 			{/* Chat area */}
@@ -179,6 +194,7 @@ export function Session() {
 									{interimTranscript ? ` ${interimTranscript}` : ""}
 								</div>
 								<button
+									type="button"
 									className="text-xs text-gray-400 hover:text-red-400 transition-colors"
 									onClick={clearTranscript}
 								>
@@ -202,6 +218,7 @@ export function Session() {
 					<p className={`text-sm font-medium ${statusColor}`}>{status}</p>
 					<div className="flex gap-4 w-full">
 						<button
+							type="button"
 							className="flex-1 btn-primary disabled:opacity-50 py-3 transition-colors"
 							onClick={isListening ? handleStop : startListening}
 							disabled={isLoading || isSpeaking}
@@ -209,6 +226,7 @@ export function Session() {
 							{isListening ? "Stop & Send" : "Start Listening"}
 						</button>
 						<button
+							type="button"
 							className="flex-1 btn-outline"
 							onClick={() => getFeedback(history)}
 							disabled={isLoadingFeedback || history.length === 0}
