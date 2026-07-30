@@ -6,7 +6,23 @@ import sessionRouter from "./routes/sessions";
 
 const app = express();
 
-app.use(cors({ origin: process.env.CORS_ORIGIN ?? "http://localhost:5173" }));
+const corsOrigin = process.env.CORS_ORIGIN ?? "http://localhost:5173";
+const previewPattern = process.env.CORS_PREVIEW_PATTERN
+	? new RegExp(process.env.CORS_PREVIEW_PATTERN)
+	: null;
+
+app.use(
+	cors({
+		origin: (origin, callback) => {
+			if (!origin || origin === corsOrigin || previewPattern?.test(origin)) {
+				callback(null, true);
+			} else {
+				callback(new Error("Not allowed by CORS"));
+			}
+		},
+	}),
+);
+
 app.use(express.json());
 
 app.use("/chat", chatRouter);
