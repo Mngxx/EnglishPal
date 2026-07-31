@@ -7,7 +7,12 @@ const router = Router();
 
 router.post("/", async (req: Request, res: Response) => {
 	const { history } = req.body as { history: HistoryMessage[] };
-
+	const userApiKey = req.headers["x-groq-api-key"] as string | undefined;
+	if (!userApiKey) {
+		res.status(400).json({ error: "API key required" });
+		return;
+	}
+	const groq = new Groq({ apiKey: userApiKey });
 	if (!history || history.length === 0) {
 		res.status(400).json({ error: "history is required" });
 		return;
@@ -16,9 +21,6 @@ router.post("/", async (req: Request, res: Response) => {
 	const formattedTranscript = history
 		.map((msg) => `${msg.role === "user" ? "User" : "AI"}: ${msg.content}`)
 		.join("\n");
-
-	const userApiKey = req.headers["x-groq-api-key"] as string | undefined;
-	const groq = new Groq({ apiKey: userApiKey ?? process.env.GROQ_API_KEY });
 
 	try {
 		const completion = await groq.chat.completions.create({

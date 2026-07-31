@@ -24,13 +24,17 @@ router.post("/", async (req: Request, res: Response) => {
 		mode: Mode;
 	};
 	const userApiKey = req.headers["x-groq-api-key"] as string | undefined;
+	if (!userApiKey) {
+		res.status(400).json({ error: "API key required" });
+		return;
+	}
+	const groq = new Groq({ apiKey: userApiKey });
 
 	if (!message) {
 		res.status(400).json({ error: "message is required" });
 		return;
 	}
 
-	const groq = userApiKey ? new Groq({ apiKey: userApiKey }) : getGroq();
 	const basePrompt = mode === "formal" ? FORMAL_PROMPT : CASUAL_PROMPT;
 
 	try {
