@@ -17,3 +17,6 @@ infra/node_modules/
 client/dist/
 server/dist/
 infra/cdk.out/
+
+# Local test documentation — not for source control
+server/src/__tests__/TESTS.md

@@ -14,6 +14,7 @@ type UseChatReturn = {
 export function useChat(
 	mode: Mode,
 	initialHistory: HistoryMessage[] = [],
+	apiKey = "",
 ): UseChatReturn {
 	const [history, setHistory] = useState<HistoryMessage[]>(initialHistory);
 	const [isLoading, setIsLoading] = useState(false);
@@ -25,11 +26,15 @@ export function useChat(
 			setError(null);
 
 			const userMessage: HistoryMessage = { role: "user", content: text };
+			const headers: Record<string, string> = {
+				"Content-Type": "application/json",
+			};
+			if (apiKey) headers["x-groq-api-key"] = apiKey;
 
 			try {
 				const response = await fetch(`${API_URL}/chat`, {
 					method: "POST",
-					headers: { "Content-Type": "application/json" },
+					headers,
 					body: JSON.stringify({
 						message: text,
 						history,
@@ -55,7 +60,7 @@ export function useChat(
 				setIsLoading(false);
 			}
 		},
-		[history, mode],
+		[history, mode, apiKey],
 	);
 
 	const clearHistory = useCallback(() => setHistory([]), []);

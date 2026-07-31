@@ -47,6 +47,7 @@ describe("POST /feedback", () => {
 	it("returns 200 with feedback when history is valid", async () => {
 		const res = await request(app)
 			.post("/feedback")
+			.set("x-groq-api-key", "gsk_testkey")
 			.send({ history: validHistory });
 		expect(res.status).toBe(200);
 		expect(res.body).toEqual({ feedback: "Great feedback here." });
@@ -64,6 +65,7 @@ describe("POST /feedback", () => {
 		);
 		const res = await request(app)
 			.post("/feedback")
+			.set("x-groq-api-key", "gsk_testkey")
 			.send({ history: validHistory });
 		expect(res.status).toBe(500);
 	});

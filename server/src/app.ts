@@ -1,8 +1,11 @@
 import cors from "cors";
 import express from "express";
-import chatRouter from "./routes/chat";
-import feedbackRouter from "./routes/feedback";
-import sessionRouter from "./routes/sessions";
+import {
+	chatRouter,
+	feedbackRouter,
+	sessionRouter,
+	validateKeyRouter,
+} from "./routes";
 
 const app = express();
 
@@ -20,6 +23,7 @@ app.use(
 				callback(new Error("Not allowed by CORS"));
 			}
 		},
+		allowedHeaders: ["Content-Type", "x-groq-api-key"],
 	}),
 );
 
@@ -28,6 +32,7 @@ app.use(express.json());
 app.use("/chat", chatRouter);
 app.use("/feedback", feedbackRouter);
 app.use("/sessions", sessionRouter);
+app.use("/validate-key", validateKeyRouter);
 
 app.get("/health", (_req, res) => {
 	res.json({ status: "ok" });
