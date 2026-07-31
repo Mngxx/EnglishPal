@@ -8,13 +8,6 @@ import {
 } from "../prompts/index";
 import type { HistoryMessage, Mode } from "../types/index";
 
-let groq: Groq | null = null;
-
-function getGroq(): Groq {
-	if (!groq) groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-	return groq;
-}
-
 const router = Router();
 
 router.post("/", async (req: Request, res: Response) => {
@@ -23,17 +16,18 @@ router.post("/", async (req: Request, res: Response) => {
 		history: HistoryMessage[];
 		mode: Mode;
 	};
+
+	if (!message) {
+		res.status(400).json({ error: "message is required" });
+		return;
+	}
+
 	const userApiKey = req.headers["x-groq-api-key"] as string | undefined;
 	if (!userApiKey) {
 		res.status(400).json({ error: "API key required" });
 		return;
 	}
 	const groq = new Groq({ apiKey: userApiKey });
-
-	if (!message) {
-		res.status(400).json({ error: "message is required" });
-		return;
-	}
 
 	const basePrompt = mode === "formal" ? FORMAL_PROMPT : CASUAL_PROMPT;
 
