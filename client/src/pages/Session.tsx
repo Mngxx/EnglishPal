@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FeedbackReport, ModeBadge } from "../components";
+import { ApiKeyModal, FeedbackReport, ModeBadge } from "../components";
 import { API_URL } from "../config";
 import {
+	useApiKey,
 	useChat,
 	useFeedback,
 	useSpeechRecognition,
@@ -12,6 +13,8 @@ import { assertOk } from "../lib/api";
 import type { HistoryMessage, Mode } from "../types/index";
 
 export function Session() {
+	const { apiKey, saveApiKey, clearApiKey } = useApiKey();
+	const [showApiKeyModal, setShowApiKeyModal] = useState(false);
 	const location = useLocation();
 	const locationState = location.state as {
 		history?: HistoryMessage[];
@@ -37,18 +40,24 @@ export function Session() {
 		isLoading,
 		error: chatError,
 		clearHistory,
-	} = useChat(mode, locationState?.history ?? []);
+	} = useChat(mode, locationState?.history ?? [], apiKey);
 	const {
 		feedback,
 		getFeedback,
 		isLoadingFeedback,
 		clearFeedback,
 		error: feedbackError,
-	} = useFeedback();
+	} = useFeedback(apiKey);
 
 	const [isSaving, setIsSaving] = useState(false);
 	const navigate = useNavigate();
-
+	const handleStartListening = () => {
+		if (!apiKey) {
+			setShowApiKeyModal(true);
+			return;
+		}
+		startListening();
+	};
 	const handleStop = async () => {
 		await stopListening();
 		const text = transcriptRef.current;
@@ -151,13 +160,22 @@ export function Session() {
 					>
 						Dashboard
 					</button>
-					<button
-						type="button"
-						className="btn-secondary"
-						onClick={() => navigate("/history")}
-					>
-						History →
-					</button>
+					<div className="flex gap-2">
+						<button
+							type="button"
+							className="btn-secondary"
+							onClick={() => setShowApiKeyModal(true)}
+						>
+							{apiKey ? "🔑 Key set" : "⚙️ API Key"}
+						</button>
+						<button
+							type="button"
+							className="btn-secondary"
+							onClick={() => navigate("/history")}
+						>
+							History →
+						</button>
+					</div>
 				</div>
 			</header>
 
@@ -220,7 +238,7 @@ export function Session() {
 						<button
 							type="button"
 							className="flex-1 btn-primary disabled:opacity-50 py-3 transition-colors"
-							onClick={isListening ? handleStop : startListening}
+							onClick={isListening ? handleStop : handleStartListening}
 							disabled={isLoading || isSpeaking}
 						>
 							{isListening ? "Stop & Send" : "Start Listening"}
@@ -242,6 +260,14 @@ export function Session() {
 					onClose={clearFeedback}
 					onSave={handleSaveSession}
 					isSaving={isSaving}
+				/>
+			)}
+			{showApiKeyModal && (
+				<ApiKeyModal
+					currentKey={apiKey}
+					onSave={saveApiKey}
+					onClear={clearApiKey}
+					onClose={() => setShowApiKeyModal(false)}
 				/>
 			)}
 		</div>
