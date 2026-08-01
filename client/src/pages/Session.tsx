@@ -1,11 +1,17 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ApiKeyModal, FeedbackReport, ModeBadge } from "../components";
+import {
+	ApiKeyModal,
+	FeedbackReport,
+	ModeBadge,
+	OnboardingWizard,
+} from "../components";
 import { API_URL } from "../config";
 import {
 	useApiKey,
 	useChat,
 	useFeedback,
+	useOnboarding,
 	useSpeechRecognition,
 	useSpeechSynthesis,
 } from "../hooks";
@@ -14,6 +20,8 @@ import type { HistoryMessage, Mode } from "../types/index";
 
 export function Session() {
 	const { apiKey, saveApiKey, clearApiKey } = useApiKey();
+	const { showOnboarding, setShowOnboarding, completeOnboarding } =
+		useOnboarding();
 	const [showApiKeyModal, setShowApiKeyModal] = useState(false);
 	const location = useLocation();
 	const locationState = location.state as {
@@ -164,6 +172,13 @@ export function Session() {
 						<button
 							type="button"
 							className="btn-secondary"
+							onClick={() => setShowOnboarding(true)}
+						>
+							❓ How it works
+						</button>
+						<button
+							type="button"
+							className="btn-secondary"
 							onClick={() => setShowApiKeyModal(true)}
 						>
 							{apiKey ? "🔑 Key set" : "⚙️ API Key"}
@@ -268,6 +283,16 @@ export function Session() {
 					onSave={saveApiKey}
 					onClear={clearApiKey}
 					onClose={() => setShowApiKeyModal(false)}
+				/>
+			)}
+			{showOnboarding && (
+				<OnboardingWizard
+					apiKey={apiKey}
+					saveApiKey={saveApiKey}
+					onFinish={() => {
+						completeOnboarding();
+						setShowOnboarding(false);
+					}}
 				/>
 			)}
 		</div>
