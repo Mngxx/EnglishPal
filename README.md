@@ -1,6 +1,7 @@
 # EnglishPal
 
-> **Status: Active Development — Phase 2 (AWS)**
+> **Status: Active Development — Phase 3 (Onboarding & Auth)**
+> Phase 1 (local MVP) and Phase 2 (AWS deployment) are complete and live.
 
 A personal AI-powered English voice assistant for improving vocabulary, fluency, and speaking confidence through real conversations — with structured feedback after every session.
 
@@ -14,7 +15,8 @@ Built for a Filipino software engineer preparing to work abroad and communicate 
 
 ## How It Works
 
-1. Set your Groq API key via the **⚙️ API Key** button (free at [console.groq.com](https://console.groq.com))
+0. First-time visitors get a short onboarding wizard — what the app does, how to get a free Groq API key, and a ready screen. Replayable anytime via the **❓ How it works** button.
+1. Set your Groq API key via the **⚙️ API Key** button (free at [console.groq.com/keys](https://console.groq.com/keys))
 2. Choose a conversation mode — **Casual** or **Formal**
 3. Press **Start Listening** — speak freely, the app transcribes in real time
 4. Press **Stop & Send** — the AI responds in text and voice
@@ -54,10 +56,11 @@ The AI remembers your last 3 sessions and uses that history to give more persona
 EnglishPal/
 ├── client/                        # React frontend (Vercel)
 │   └── src/
-│       ├── components/            # ApiKeyModal, FeedbackReport, ModeBadge
+│       ├── components/            # ApiKeyModal, GroqKeyForm, FeedbackReport,
+│       │                          # ModeBadge, OnboardingWizard
 │       ├── hooks/                 # useApiKey, useChat, useFeedback,
-│       │                          # useHistory, useSpeechRecognition,
-│       │                          # useSpeechSynthesis
+│       │                          # useHistory, useOnboarding,
+│       │                          # useSpeechRecognition, useSpeechSynthesis
 │       ├── pages/                 # Session, History, Dashboard
 │       ├── utils/                 # parseFeedback (clarity score parser)
 │       └── types/                 # shared TypeScript types
@@ -101,7 +104,7 @@ All AI routes (`/chat`, `/feedback`) require an `x-groq-api-key` request header.
 
 ## Getting Started (Local Development)
 
-**Prerequisites:** Node.js 18+, Google Chrome, a free [Groq API key](https://console.groq.com)
+**Prerequisites:** Node.js 18+, Google Chrome, AWS credentials configured locally (`aws configure`) so the backend can reach DynamoDB, a free [Groq API key](https://console.groq.com/keys)
 
 ```bash
 # 1. Clone the repo
@@ -110,7 +113,6 @@ cd EnglishPal
 
 # 2. Set up the backend
 cd server
-cp .env.example .env   # add GROQ_API_KEY (used only for local dev)
 npm install
 npm run dev            # runs on http://localhost:3000
 
@@ -121,9 +123,9 @@ npm install
 npm run dev            # runs on http://localhost:5173
 ```
 
-Open `http://localhost:5173` in **Google Chrome**, then use the **⚙️ API Key** button to set your Groq key.
+Open `http://localhost:5173` in **Google Chrome**. On first visit the onboarding wizard walks you through getting and entering your Groq key — it's stored in your browser's `localStorage` and sent only as a request header, never persisted server-side. You can also set or update it anytime via the **⚙️ API Key** button.
 
-> Note: `.env` and `.env.local` are git-ignored. Never commit your API key.
+> Note: `client/.env.local` is git-ignored. Never commit your API key.
 
 ### Running Tests
 
@@ -153,6 +155,9 @@ Tracks clarity scores over time with a line chart. Shows total sessions, latest 
 ### Per-User API Key
 Each user supplies their own Groq API key. Keys are stored in `localStorage` — never sent to the server except as a request header forwarded directly to Groq. A live validation check confirms the key works before it is saved.
 
+### Onboarding
+New users see a 3-step wizard on first visit — a quick intro to the app, help getting a free Groq key (prefilled if one is already saved), and a ready screen. Replayable anytime via the **❓ How it works** button in the header.
+
 ---
 
 ## Roadmap
@@ -175,9 +180,9 @@ Each user supplies their own Groq API key. Keys are stored in `localStorage` —
 - [x] Per-user Groq API key with live validation
 - [x] CORS support for Vercel preview deployments
 
-### Phase 3 — Planned
+### Phase 3 — In Progress
+- [x] Onboarding flow for new users
 - [ ] User authentication (per-user data isolation)
-- [ ] Onboarding flow for new users
 
 ---
 

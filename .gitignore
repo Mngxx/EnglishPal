@@ -20,3 +20,6 @@ infra/cdk.out/
 
 # Local test documentation — not for source control
 server/src/__tests__/TESTS.md
+
+# Personal project notes — not for the public repo
+englishpal_plan.md
