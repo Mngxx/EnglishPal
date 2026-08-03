@@ -15,7 +15,7 @@ import {
 	useSpeechRecognition,
 	useSpeechSynthesis,
 } from "../hooks";
-import { assertOk } from "../lib/api";
+import { assertOk, authorizedFetch } from "../lib/api";
 import type { HistoryMessage, Mode } from "../types/index";
 
 export function Session() {
@@ -79,14 +79,17 @@ export function Session() {
 		try {
 			const sessionId = locationState?.id;
 			if (sessionId) {
-				const response = await fetch(`${API_URL}/sessions/${sessionId}`, {
-					method: "PATCH",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ transcript: history, feedback }),
-				});
+				const response = await authorizedFetch(
+					`${API_URL}/sessions/${sessionId}`,
+					{
+						method: "PATCH",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ transcript: history, feedback }),
+					},
+				);
 				await assertOk(response);
 			} else {
-				const response = await fetch(`${API_URL}/sessions`, {
+				const response = await authorizedFetch(`${API_URL}/sessions`, {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({

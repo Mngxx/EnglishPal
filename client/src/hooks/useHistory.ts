@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { API_URL } from "../config";
-import { assertOk } from "../lib/api";
+import { assertOk, authorizedFetch } from "../lib/api";
 import type { Session } from "../types";
 
 interface useHistoryReturn {
@@ -17,7 +17,7 @@ export function useHistory(): useHistoryReturn {
 	useEffect(() => {
 		const fetchSessions = async () => {
 			try {
-				const response = await fetch(`${API_URL}/sessions`);
+				const response = await authorizedFetch(`${API_URL}/sessions`);
 				await assertOk(response);
 				const data = (await response.json()) as Session[];
 				setSessions(data);
@@ -34,7 +34,7 @@ export function useHistory(): useHistoryReturn {
 
 	const deleteSession = useCallback(async (id: string) => {
 		try {
-			const response = await fetch(`${API_URL}/sessions/${id}`, {
+			const response = await authorizedFetch(`${API_URL}/sessions/${id}`, {
 				method: "DELETE",
 			});
 			await assertOk(response);

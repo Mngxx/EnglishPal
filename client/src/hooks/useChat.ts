@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { API_URL } from "../config";
-import { assertOk } from "../lib/api";
+import { assertOk, authorizedFetch } from "../lib/api";
 import type { HistoryMessage, Mode } from "../types";
 
 type UseChatReturn = {
@@ -32,7 +32,7 @@ export function useChat(
 			if (apiKey) headers["x-groq-api-key"] = apiKey;
 
 			try {
-				const response = await fetch(`${API_URL}/chat`, {
+				const response = await authorizedFetch(`${API_URL}/chat`, {
 					method: "POST",
 					headers,
 					body: JSON.stringify({
