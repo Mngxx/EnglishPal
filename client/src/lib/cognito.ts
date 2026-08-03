@@ -4,6 +4,11 @@ import {
 } from "amazon-cognito-identity-js";
 import { COGNITO_CLIENT_ID, COGNITO_USER_POOL_ID } from "../config";
 
+export const userPool = new CognitoUserPool({
+	UserPoolId: COGNITO_USER_POOL_ID,
+	ClientId: COGNITO_CLIENT_ID,
+});
+
 export function getCurrentSession(): Promise<CognitoUserSession | null> {
 	const cognitoUser = userPool.getCurrentUser();
 	if (!cognitoUser) {
@@ -29,8 +34,3 @@ export async function getIdToken(): Promise<string> {
 	}
 	return session.getIdToken().getJwtToken();
 }
-
-export const userPool = new CognitoUserPool({
-	UserPoolId: COGNITO_USER_POOL_ID,
-	ClientId: COGNITO_CLIENT_ID,
-});
