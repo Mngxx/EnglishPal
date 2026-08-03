@@ -9,6 +9,7 @@ import {
 import { API_URL } from "../config";
 import {
 	useApiKey,
+	useAuth,
 	useChat,
 	useFeedback,
 	useOnboarding,
@@ -20,6 +21,7 @@ import type { HistoryMessage, Mode } from "../types/index";
 
 export function Session() {
 	const { apiKey, saveApiKey, clearApiKey } = useApiKey();
+	const { signOut } = useAuth();
 	const { showOnboarding, setShowOnboarding, completeOnboarding } =
 		useOnboarding();
 	const [showApiKeyModal, setShowApiKeyModal] = useState(false);
@@ -65,6 +67,10 @@ export function Session() {
 			return;
 		}
 		startListening();
+	};
+	const handleLogout = async () => {
+		await signOut();
+		navigate("/login", { replace: true });
 	};
 	const handleStop = async () => {
 		await stopListening();
@@ -192,6 +198,9 @@ export function Session() {
 							onClick={() => navigate("/history")}
 						>
 							History →
+						</button>
+						<button type="button" className="btn-secondary" onClick={handleLogout}>
+							Log out
 						</button>
 					</div>
 				</div>
