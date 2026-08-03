@@ -1,10 +1,13 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Dashboard } from "./pages/Dashboard";
-import { History } from "./pages/History";
-import { Login } from "./pages/Login";
-import { Session } from "./pages/Session";
-import { SessionDetail } from "./pages/SessionDetail";
-import { Signup } from "./pages/Signup";
+import { ProtectedRoute } from "./components";
+import {
+	Dashboard,
+	History,
+	Login,
+	Session,
+	SessionDetail,
+	Signup,
+} from "./pages";
 
 function App() {
 	return (
@@ -13,10 +16,12 @@ function App() {
 				{/* Define routes mapping paths to components */}
 				<Route path="/login" element={<Login />} />
 				<Route path="/signup" element={<Signup />} />
-				<Route path="/" element={<Session />} />
-				<Route path="/history" element={<History />} />
-				<Route path="/history/:id" element={<SessionDetail />} />
-				<Route path="/dashboard" element={<Dashboard />} />
+				<Route element={<ProtectedRoute />}>
+					<Route path="/" element={<Session />} />
+					<Route path="/history" element={<History />} />
+					<Route path="/history/:id" element={<SessionDetail />} />
+					<Route path="/dashboard" element={<Dashboard />} />
+				</Route>
 			</Routes>
 		</BrowserRouter>
 	);
