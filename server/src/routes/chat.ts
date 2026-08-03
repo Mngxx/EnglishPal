@@ -32,7 +32,7 @@ router.post("/", async (req: Request, res: Response) => {
 	const basePrompt = mode === "formal" ? FORMAL_PROMPT : CASUAL_PROMPT;
 
 	try {
-		const recentSessions = await getRecentSessions(3);
+		const recentSessions = await getRecentSessions(req.userId, 3);
 		const systemPrompt = basePrompt + buildMemoryContext(recentSessions);
 		const completion = await groq.chat.completions.create({
 			model: "llama-3.1-8b-instant",

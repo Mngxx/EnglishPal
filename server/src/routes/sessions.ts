@@ -22,7 +22,13 @@ router.post("/", async (req: Request, res: Response) => {
 		return;
 	}
 	try {
-		const session = await addSession(date, mode, transcript, feedback);
+		const session = await addSession(
+			req.userId,
+			date,
+			mode,
+			transcript,
+			feedback,
+		);
 		res.status(201).json(session);
 	} catch (err) {
 		res.status(500).json({
@@ -47,12 +53,17 @@ router.patch("/:id", async (req: Request<{ id: string }>, res: Response) => {
 		return;
 	}
 	try {
-		const existing = await getSessionById(id);
+		const existing = await getSessionById(req.userId, id);
 		if (!existing) {
 			res.status(404).json({ error: "Session not found" });
 			return;
 		}
-		const session = await updateSessionByID(transcript, feedback, id);
+		const session = await updateSessionByID(
+			req.userId,
+			transcript,
+			feedback,
+			id,
+		);
 		res.status(200).json(session);
 	} catch (err) {
 		res.status(500).json({
@@ -69,7 +80,7 @@ router.delete("/:id", async (req: Request<{ id: string }>, res: Response) => {
 		return;
 	}
 	try {
-		await deleteSessionById(id);
+		await deleteSessionById(req.userId, id);
 		res.status(200).json({ message: "Session deleted" });
 	} catch (err) {
 		res.status(500).json({
@@ -81,7 +92,7 @@ router.delete("/:id", async (req: Request<{ id: string }>, res: Response) => {
 
 router.get("/", async (req: Request, res: Response) => {
 	try {
-		const sessions = await getAllSessions();
+		const sessions = await getAllSessions(req.userId);
 		res.status(200).json(sessions);
 	} catch (err) {
 		res.status(500).json({
@@ -98,7 +109,7 @@ router.get("/:id", async (req: Request<{ id: string }>, res: Response) => {
 		return;
 	}
 	try {
-		const session = await getSessionById(id);
+		const session = await getSessionById(req.userId, id);
 		if (!session) {
 			res.status(404).json({ error: "Session not found" });
 			return;
