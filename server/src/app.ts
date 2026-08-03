@@ -1,5 +1,6 @@
 import cors from "cors";
 import express from "express";
+import { authMiddleware } from "./middleware/auth";
 import {
 	chatRouter,
 	feedbackRouter,
@@ -28,6 +29,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use(authMiddleware);
 
 app.use("/chat", chatRouter);
 app.use("/feedback", feedbackRouter);

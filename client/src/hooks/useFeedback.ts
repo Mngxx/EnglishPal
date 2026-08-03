@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { API_URL } from "../config";
-import { assertOk } from "../lib/api";
+import { assertOk, authorizedFetch } from "../lib/api";
 import type { HistoryMessage } from "../types";
 
 interface useFeedbackReturn {
@@ -25,7 +25,7 @@ export function useFeedback(apiKey = ""): useFeedbackReturn {
 			setIsLoadingFeedback(true);
 			setError(null);
 			try {
-				const response = await fetch(`${API_URL}/feedback`, {
+				const response = await authorizedFetch(`${API_URL}/feedback`, {
 					method: "POST",
 					headers,
 					body: JSON.stringify({ history }),

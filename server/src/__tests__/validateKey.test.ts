@@ -1,8 +1,15 @@
+import type { NextFunction, Request, Response } from "express";
 import Groq from "groq-sdk";
 import request from "supertest";
 import app from "../app";
 
 jest.mock("groq-sdk");
+jest.mock("../middleware/auth", () => ({
+	authMiddleware: (req: Request, _res: Response, next: NextFunction) => {
+		req.userId = "test-user-id";
+		next();
+	},
+}));
 
 const mockModelsList = jest.fn();
 

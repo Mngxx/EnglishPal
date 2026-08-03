@@ -3,7 +3,7 @@ import ReactMarkdown from "react-markdown";
 import { useNavigate, useParams } from "react-router-dom";
 import { ModeBadge } from "../components";
 import { API_URL } from "../config";
-import { assertOk } from "../lib/api";
+import { assertOk, authorizedFetch } from "../lib/api";
 import type { Session } from "../types";
 
 export function SessionDetail() {
@@ -16,7 +16,7 @@ export function SessionDetail() {
 	useEffect(() => {
 		const fetchSession = async () => {
 			try {
-				const response = await fetch(`${API_URL}/sessions/${id}`);
+				const response = await authorizedFetch(`${API_URL}/sessions/${id}`);
 				await assertOk(response);
 				const data = (await response.json()) as Session;
 				setSession(data);
@@ -33,7 +33,7 @@ export function SessionDetail() {
 
 	const handleDelete = async () => {
 		try {
-			const response = await fetch(`${API_URL}/sessions/${id}`, {
+			const response = await authorizedFetch(`${API_URL}/sessions/${id}`, {
 				method: "DELETE",
 			});
 			await assertOk(response);

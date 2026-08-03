@@ -14,9 +14,9 @@ const client = new DynamoDBClient({});
 const ddb = DynamoDBDocumentClient.from(client);
 
 const SESSIONS_TABLE = process.env.SESSIONS_TABLE ?? "EnglishPalSessions";
-const DEFAULT_USER_ID = "default";
 
 export const addSession = async (
+	userId: string,
 	date: string,
 	mode: Mode,
 	transcript: HistoryMessage[],
@@ -27,7 +27,7 @@ export const addSession = async (
 		new PutCommand({
 			TableName: SESSIONS_TABLE,
 			Item: {
-				userId: DEFAULT_USER_ID,
+				userId: userId,
 				sessionId,
 				date,
 				mode,
@@ -39,12 +39,12 @@ export const addSession = async (
 	return { id: sessionId, date, mode, transcript, feedback };
 };
 
-export const getAllSessions = async (): Promise<Session[]> => {
+export const getAllSessions = async (userId: string): Promise<Session[]> => {
 	const result = await ddb.send(
 		new QueryCommand({
 			TableName: SESSIONS_TABLE,
 			KeyConditionExpression: "userId = :userId",
-			ExpressionAttributeValues: { ":userId": DEFAULT_USER_ID },
+			ExpressionAttributeValues: { ":userId": userId },
 			ScanIndexForward: false,
 		}),
 	);
@@ -57,12 +57,15 @@ export const getAllSessions = async (): Promise<Session[]> => {
 	}));
 };
 
-export const getRecentSessions = async (limit: number): Promise<Session[]> => {
+export const getRecentSessions = async (
+	userId: string,
+	limit: number,
+): Promise<Session[]> => {
 	const result = await ddb.send(
 		new QueryCommand({
 			TableName: SESSIONS_TABLE,
 			KeyConditionExpression: "userId = :userId",
-			ExpressionAttributeValues: { ":userId": DEFAULT_USER_ID },
+			ExpressionAttributeValues: { ":userId": userId },
 			ScanIndexForward: false,
 			Limit: limit,
 		}),
@@ -77,12 +80,13 @@ export const getRecentSessions = async (limit: number): Promise<Session[]> => {
 };
 
 export const getSessionById = async (
+	userId: string,
 	id: string,
 ): Promise<Session | undefined> => {
 	const result = await ddb.send(
 		new GetCommand({
 			TableName: SESSIONS_TABLE,
-			Key: { userId: DEFAULT_USER_ID, sessionId: id },
+			Key: { userId: userId, sessionId: id },
 		}),
 	);
 	if (!result.Item) return undefined;
@@ -96,6 +100,7 @@ export const getSessionById = async (
 };
 
 export const updateSessionByID = async (
+	userId: string,
 	transcript: HistoryMessage[],
 	feedback: string,
 	id: string,
@@ -103,7 +108,7 @@ export const updateSessionByID = async (
 	const result = await ddb.send(
 		new UpdateCommand({
 			TableName: SESSIONS_TABLE,
-			Key: { userId: DEFAULT_USER_ID, sessionId: id },
+			Key: { userId: userId, sessionId: id },
 			UpdateExpression: "SET transcript = :transcript, feedback = :feedback",
 			ExpressionAttributeValues: {
 				":transcript": transcript,
@@ -122,11 +127,14 @@ export const updateSessionByID = async (
 	};
 };
 
-export const deleteSessionById = async (id: string): Promise<void> => {
+export const deleteSessionById = async (
+	userId: string,
+	id: string,
+): Promise<void> => {
 	await ddb.send(
 		new DeleteCommand({
 			TableName: SESSIONS_TABLE,
-			Key: { userId: DEFAULT_USER_ID, sessionId: id },
+			Key: { userId: userId, sessionId: id },
 		}),
 	);
 };
