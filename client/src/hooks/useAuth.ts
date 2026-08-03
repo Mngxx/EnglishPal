@@ -1,10 +1,6 @@
-import {
-	AuthenticationDetails,
-	CognitoUser,
-	type CognitoUserSession,
-} from "amazon-cognito-identity-js";
+import { AuthenticationDetails, CognitoUser } from "amazon-cognito-identity-js";
 import { useCallback, useEffect, useState } from "react";
-import { userPool } from "../lib/cognito";
+import { getCurrentSession, getIdToken, userPool } from "../lib/cognito";
 
 interface UseAuthReturn {
 	isAuthenticated: boolean;
@@ -14,24 +10,6 @@ interface UseAuthReturn {
 	signIn: (email: string, password: string) => Promise<void>;
 	signOut: () => Promise<void>;
 	getIdToken: () => Promise<string>;
-}
-
-function getCurrentSession(): Promise<CognitoUserSession | null> {
-	const cognitoUser = userPool.getCurrentUser();
-	if (!cognitoUser) {
-		return Promise.resolve(null);
-	}
-	return new Promise((resolve, reject) => {
-		cognitoUser.getSession(
-			(err: Error | null, session: CognitoUserSession | null) => {
-				if (err) {
-					reject(err);
-					return;
-				}
-				resolve(session);
-			},
-		);
-	});
 }
 
 export function useAuth(): UseAuthReturn {
@@ -101,14 +79,6 @@ export function useAuth(): UseAuthReturn {
 	const signOut = useCallback(async (): Promise<void> => {
 		userPool.getCurrentUser()?.signOut();
 		setIsAuthenticated(false);
-	}, []);
-
-	const getIdToken = useCallback(async (): Promise<string> => {
-		const session = await getCurrentSession();
-		if (!session?.isValid()) {
-			throw new Error("No active session");
-		}
-		return session.getIdToken().getJwtToken();
 	}, []);
 
 	return {
