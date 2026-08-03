@@ -1,3 +1,4 @@
+import type { NextFunction, Request, Response } from "express";
 import request from "supertest";
 import app from "../app";
 import {
@@ -9,6 +10,12 @@ import {
 } from "../db/dynamodb";
 
 jest.mock("../db/dynamodb");
+jest.mock("../middleware/auth", () => ({
+	authMiddleware: (req: Request, _res: Response, next: NextFunction) => {
+		req.userId = "test-user-id";
+		next();
+	},
+}));
 
 const mockAddSession = jest.mocked(addSession);
 const mockGetSessionById = jest.mocked(getSessionById);
@@ -62,6 +69,13 @@ describe("POST /sessions", () => {
 		const res = await request(app).post("/sessions").send(validBody);
 		expect(res.status).toBe(201);
 		expect(res.body).toEqual(mockSession);
+		expect(mockAddSession).toHaveBeenCalledWith(
+			"test-user-id",
+			validBody.date,
+			validBody.mode,
+			validBody.transcript,
+			validBody.feedback,
+		);
 	});
 	it("returns 500 when database throws on POST", async () => {
 		mockAddSession.mockRejectedValueOnce(new Error("DynamoDB failed"));
@@ -164,6 +178,7 @@ describe("GET /sessions", () => {
 		const res = await request(app).get("/sessions");
 		expect(res.status).toBe(200);
 		expect(res.body).toEqual(mockSessions);
+		expect(mockGetAllSessions).toHaveBeenCalledWith("test-user-id");
 	});
 	it("returns 500 when database throws on GET all", async () => {
 		mockGetAllSessions.mockRejectedValueOnce(new Error("DynamoDB failed"));
