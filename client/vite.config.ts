@@ -8,6 +8,9 @@ export default defineConfig({
     react(),
     tailwindcss()
   ],
+  define: {
+    global: 'globalThis'
+  },
   server: {
     port: 5173
   }
