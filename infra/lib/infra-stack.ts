@@ -54,6 +54,8 @@ export class InfraStack extends cdk.Stack {
 				NODE_ENV: "production",
 				CORS_ORIGIN: "https://english-pal-one.vercel.app",
 				CORS_PREVIEW_PATTERN: "^https://english-pal[^.]*\\.vercel\\.app$",
+				COGNITO_USER_POOL_ID: userPool.userPoolId,
+				COGNITO_CLIENT_ID: userPoolClient.userPoolClientId,
 			},
 		});
 
