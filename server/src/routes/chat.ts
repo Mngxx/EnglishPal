@@ -35,7 +35,7 @@ router.post("/", async (req: Request, res: Response) => {
 		const recentSessions = await getRecentSessions(req.userId, 3);
 		const systemPrompt = basePrompt + buildMemoryContext(recentSessions);
 		const completion = await groq.chat.completions.create({
-			model: "llama-3.1-8b-instant",
+			model: "openai/gpt-oss-20b",
 			messages: [
 				{ role: "system", content: systemPrompt },
 				...(history ?? []),

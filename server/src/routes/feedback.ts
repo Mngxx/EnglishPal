@@ -24,7 +24,7 @@ router.post("/", async (req: Request, res: Response) => {
 
 	try {
 		const completion = await groq.chat.completions.create({
-			model: "llama-3.1-8b-instant",
+			model: "openai/gpt-oss-20b",
 			messages: [
 				{ role: "system", content: FEEDBACK_PROMPT },
 				{ role: "user", content: formattedTranscript }, // the transcript as text
